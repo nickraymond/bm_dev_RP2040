@@ -5,6 +5,8 @@ When you enter a command in the Spotter console, the RP2040 will receive the mes
 
 
 ## 0. Special setup for writting files to memory
+Install the `bm_store.py` library from the `lib` folder to your CIRCUITPY drive if you have not already done so. This helps with reading and writing JSON config files.
+
 Circuit Python inclues some safety features when you are plugged into the device over USB. It prevents you code.py file from being able to write to files on the CIRCUITPY drive while you are connected over USB. To disable this feature, you need to create a file called `settings.toml` in the root of the CIRCUITPY drive with the following content:
 
 You have a few options:
