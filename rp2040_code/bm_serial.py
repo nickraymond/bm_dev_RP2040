@@ -6,50 +6,51 @@ import board
 import busio
 import time
 
+
 class BristlemouthSerial:
     # Message type constants (align with Pi implementation)
-    BM_SERIAL_DEBUG             = 0x00
-    BM_SERIAL_ACK               = 0x01
-    BM_SERIAL_PUB               = 0x02
-    BM_SERIAL_SUB               = 0x03
-    BM_SERIAL_UNSUB             = 0x04
-    BM_SERIAL_LOG               = 0x05
-    BM_SERIAL_NET_MSG           = 0x06
-    BM_SERIAL_RTC_SET           = 0x07
-    BM_SERIAL_SELF_TEST         = 0x08
-    BM_SERIAL_NETWORK_INFO      = 0x09
-    BM_SERIAL_REBOOT_INFO       = 0x0A
-    BM_SERIAL_DFU_START         = 0x30
-    BM_SERIAL_DFU_CHUNK         = 0x31
-    BM_SERIAL_DFU_RESULT        = 0x32
-    BM_SERIAL_CFG_GET           = 0x40
-    BM_SERIAL_CFG_SET           = 0x41
-    BM_SERIAL_CFG_VALUE         = 0x42
-    BM_SERIAL_CFG_COMMIT        = 0x43
-    BM_SERIAL_CFG_STATUS_REQ    = 0x44
-    BM_SERIAL_CFG_STATUS_RESP   = 0x45
-    BM_SERIAL_CFG_DEL_REQ       = 0x46
-    BM_SERIAL_CFG_DEL_RESP      = 0x47
-    BM_SERIAL_CFG_CLEAR_REQ     = 0x48
-    BM_SERIAL_CFG_CLEAR_RESP    = 0x49
-    BM_SERIAL_DEVICE_INFO_REQ   = 0x50
+    BM_SERIAL_DEBUG = 0x00
+    BM_SERIAL_ACK = 0x01
+    BM_SERIAL_PUB = 0x02
+    BM_SERIAL_SUB = 0x03
+    BM_SERIAL_UNSUB = 0x04
+    BM_SERIAL_LOG = 0x05
+    BM_SERIAL_NET_MSG = 0x06
+    BM_SERIAL_RTC_SET = 0x07
+    BM_SERIAL_SELF_TEST = 0x08
+    BM_SERIAL_NETWORK_INFO = 0x09
+    BM_SERIAL_REBOOT_INFO = 0x0A
+    BM_SERIAL_DFU_START = 0x30
+    BM_SERIAL_DFU_CHUNK = 0x31
+    BM_SERIAL_DFU_RESULT = 0x32
+    BM_SERIAL_CFG_GET = 0x40
+    BM_SERIAL_CFG_SET = 0x41
+    BM_SERIAL_CFG_VALUE = 0x42
+    BM_SERIAL_CFG_COMMIT = 0x43
+    BM_SERIAL_CFG_STATUS_REQ = 0x44
+    BM_SERIAL_CFG_STATUS_RESP = 0x45
+    BM_SERIAL_CFG_DEL_REQ = 0x46
+    BM_SERIAL_CFG_DEL_RESP = 0x47
+    BM_SERIAL_CFG_CLEAR_REQ = 0x48
+    BM_SERIAL_CFG_CLEAR_RESP = 0x49
+    BM_SERIAL_DEVICE_INFO_REQ = 0x50
     BM_SERIAL_DEVICE_INFO_REPLY = 0x51
-    BM_SERIAL_RESOURCE_REQ      = 0x52
-    BM_SERIAL_RESOURCE_REPLY    = 0x53
-    BM_SERIAL_NODE_ID_REQ       = 0x60
-    BM_SERIAL_NODE_ID_REPLY     = 0x61
-    BM_SERIAL_BAUD_RATE_REQ     = 0x70
-    BM_SERIAL_BAUD_RATE_REPLY   = 0x71
+    BM_SERIAL_RESOURCE_REQ = 0x52
+    BM_SERIAL_RESOURCE_REPLY = 0x53
+    BM_SERIAL_NODE_ID_REQ = 0x60
+    BM_SERIAL_NODE_ID_REPLY = 0x61
+    BM_SERIAL_BAUD_RATE_REQ = 0x70
+    BM_SERIAL_BAUD_RATE_REPLY = 0x71
 
     def __init__(
-        self,
-        uart=None,
-        node_id: int = 0xC0FFEEEEF0CACC1A,
-        baudrate: int = 115200,
-        rx_bufsize: int = 512
+            self,
+            uart=None,
+            node_id: int = 0xC0FFEEEEF0CACC1A,
+            baudrate: int = 115200,
+            rx_bufsize: int = 512
     ) -> None:
         self.node_id = node_id
-        self.sub_cbs = []                 # callbacks: fn(node_id, type, version, topic_len, topic, data_len, data)
+        self.sub_cbs = []  # callbacks: fn(node_id, type, version, topic_len, topic, data_len, data)
         self._rx_buf = bytearray(rx_bufsize)
 
         if uart is None:
@@ -77,9 +78,9 @@ class BristlemouthSerial:
 
         topic_b = topic.encode("utf-8")
         packet = (
-            bytearray.fromhex("03000000")            # [type=0x03, 0x00, CRC(lo), CRC(hi)]
-            + len(topic_b).to_bytes(2, "little")     # topic length (u16 LE)
-            + topic_b
+                bytearray.fromhex("03000000")  # [type=0x03, 0x00, CRC(lo), CRC(hi)]
+                + len(topic_b).to_bytes(2, "little")  # topic length (u16 LE)
+                + topic_b
         )
         return self._uart_write(self._finalize_packet(packet))
 
@@ -89,11 +90,11 @@ class BristlemouthSerial:
         """
         topic = b"spotter/transmit-data"
         packet = (
-            self._get_pub_header()
-            + len(topic).to_bytes(2, "little")
-            + topic
-            + b"\x01"            # version (kept from your working code)
-            + data
+                self._get_pub_header()
+                + len(topic).to_bytes(2, "little")
+                + topic
+                + b"\x01"  # version (kept from your working code)
+                + data
         )
         return self._uart_write(self._finalize_packet(packet))
 
@@ -105,15 +106,34 @@ class BristlemouthSerial:
         fn_b = filename.encode("utf-8")
         data_b = data.encode("utf-8")
         packet = (
-            self._get_pub_header()
-            + len(topic).to_bytes(2, "little")
-            + topic
-            + (b"\x00" * 8)  # reserved
-            + len(fn_b).to_bytes(2, "little")
-            + (len(data_b) + 1).to_bytes(2, "little")
-            + fn_b
-            + data_b
-            + b"\n"
+                self._get_pub_header()
+                + len(topic).to_bytes(2, "little")
+                + topic
+                + (b"\x00" * 8)  # reserved
+                + len(fn_b).to_bytes(2, "little")
+                + (len(data_b) + 1).to_bytes(2, "little")
+                + fn_b
+                + data_b
+                + b"\n"
+        )
+        return self._uart_write(self._finalize_packet(packet))
+
+    def spotter_print(self, data: str):
+        """
+        Print a human-readable line to the Spotter terminal (no SD write).
+        Uses topic 'spotter/printf' and mirrors the same payload shape
+        as spotter_log() (zero filename length + data length + newline).
+        """
+        topic = b"spotter/printf"
+        packet = (
+                self._get_pub_header()
+                + len(topic).to_bytes(2, "little")
+                + topic
+                + (b"\x00" * 8)  # reserved
+                + (0).to_bytes(2, "little")  # filename length = 0
+                + (len(data) + 1).to_bytes(2, "little")  # data length (+ newline)
+                + data.encode("utf-8")
+                + b"\n"
         )
         return self._uart_write(self._finalize_packet(packet))
 
@@ -170,9 +190,9 @@ class BristlemouthSerial:
         if len(payload) < 12:
             return
         try:
-            node_id   = int.from_bytes(payload[0:8], "little")
-            msg_type  = payload[8]
-            version   = payload[9]
+            node_id = int.from_bytes(payload[0:8], "little")
+            msg_type = payload[8]
+            version = payload[9]
             topic_len = int.from_bytes(payload[10:12], "little")
 
             end_topic = 12 + topic_len
@@ -201,13 +221,13 @@ class BristlemouthSerial:
         checksum = self._crc(0, packet)
         packet[2] = checksum & 0xFF
         packet[3] = (checksum >> 8) & 0xFF
-        return self._cobs_encode(packet) + b"\x00"   # TX uses COBS + delimiter
+        return self._cobs_encode(packet) + b"\x00"  # TX uses COBS + delimiter
 
     def _get_pub_header(self) -> bytearray:
         return (
-            bytearray.fromhex("02000000")
-            + self.node_id.to_bytes(8, "little")
-            + bytearray.fromhex("0101")
+                bytearray.fromhex("02000000")
+                + self.node_id.to_bytes(8, "little")
+                + bytearray.fromhex("0101")
         )
 
     # ---------- COBS (TX only) ----------
