@@ -3,7 +3,7 @@
 2. Install Circuit Python on your [RP2040 QTPY board](https://www.adafruit.com/product/4900)
 3. Install `bm_serial.py` into the `lib` folder of your CIRCUITPY drive
 4. Wire the mote to the RP2040 (as shown below)
-5. Copy the `code.py` to your CIRCUITPY drive and run it
+5. Copy the `hello_world.py` to your CIRCUITPY drive and name it `code.py`
 6. Send a command from you Spotter Ebox console, see messge in REPL
 
 ## 💾 Files you will need for the mote
