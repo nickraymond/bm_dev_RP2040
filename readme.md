@@ -1,10 +1,10 @@
 # "hello_world" quick start guide
 1. Update mote firmware
 2. Install Circuit Python on your [RP2040 QTPY board](https://www.adafruit.com/product/4900)
-3. Install bm_serial.py in the `lib` folder of your CIRCUITPY drive
-4. Wire the mote to the RP2040 as shown below
-5. Copy the example code to your CIRCUITPY drive and run it
-6. Send command from you Spotter Ebox console, see messge in REPL
+3. Install `bm_serial.py` into the `lib` folder of your CIRCUITPY drive
+4. Wire the mote to the RP2040 (as shown below)
+5. Copy the `code.py` to your CIRCUITPY drive and run it
+6. Send a command from you Spotter Ebox console, see messge in REPL
 
 ## 💾 Files you will need for the mote
 Follow these instructions for flashing new firmware to mote 
@@ -40,6 +40,8 @@ Update finished: 49cfe4d7cceb2771 success: 1 err:0
 ## Wiring the RP2040 to the Mote
 I am using an Adafruit RP2040 QTPY board for this example. The wiring is as follows:
 ![Wiring instructions.png](Wiring%20instructions.png)
+
+
 ## Send a message over BM Bus to the RP2040
 Enter the following command into the Spotter Ebox console to send a message to the RP2040
 ``` 
